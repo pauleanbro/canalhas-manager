@@ -21,6 +21,7 @@ import {
 } from "./components/ui/dialog";
 import { Button } from "./components/ui/button";
 import { Input } from "./components/ui/input";
+import AdminManager from "./pages/admin";
 import { cn } from "./lib/utils";
 
 function App() {
@@ -155,6 +156,7 @@ function App() {
                   <Route path="/maps" element={<MapsPage />} />
                   <Route path="/webhooks" element={<WebhooksPage />} />
                   <Route path="/settings" element={<SettingsPage />} />
+                  <Route path="/administradores" element={<AdminManager />} />
                 </Routes>
               </div>
             </div>

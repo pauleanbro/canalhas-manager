@@ -39,7 +39,9 @@ export default function SettingsPage() {
     <div className="w-full h-full p-8">
       <div className="flex items-center gap-2 text-muted-foreground mb-8">
         <Settings className="w-5 h-5" />
-        <h2 className="text-lg font-semibold">Configurações do Servidor</h2>
+        <h2 className="text-lg font-semibold">
+          Configurações de Inicialização
+        </h2>
       </div>
 
       <form
