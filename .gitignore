@@ -1,0 +1,47 @@
+# Node
+node_modules/
+dist/
+build/
+.env
+.env.*.local
+*.local
+
+# macOS
+.DS_Store
+
+# Tauri
+/src-tauri/target/
+src-tauri/Cargo.lock
+/src-tauri/.cargo/
+src-tauri/tauri.conf.json
+
+# Rust
+**/*.rs.bk
+Cargo.lock
+target/
+
+# Vite
+.vite/
+vite.svg
+
+# pnpm
+pnpm-lock.yaml
+
+# yarn
+yarn.lock
+
+# npm
+package-lock.json
+
+# Logs
+*.log
+
+# IDEs
+.idea/
+.vscode/
+*.sw?
+
+# Others
+*.bak
+*.tmp
+*.old
