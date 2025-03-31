@@ -31,6 +31,7 @@ export default function WebhookManager() {
     "map_added",
     "map_deleted",
     "map_changed",
+    "custom_event",
   ];
 
   const loadWebhooks = async () => {
