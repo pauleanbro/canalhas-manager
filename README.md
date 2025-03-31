@@ -1,54 +1,81 @@
-# React + TypeScript + Vite
+# Canalhas Manager 💀🧠
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> A modern and cross-platform control panel for HLDS/ReHLDS servers.
 
-Currently, two official plugins are available:
+Canalhas Manager is a graphical control panel focused on **home dedicated Counter-Strike 1.6 servers**, with full support for the **CS Revo Linux base** (tested base). Developed with Tauri, React, and Rust, the project offers an intuitive interface and practical tools for those who want to manage their server easily.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+![screenshot](https://i.imgur.com/rJ8QAzt.png)
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 🚀 Features
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+- ✅ Start/stop HLDS server with a single click
+- 🔍 Real-time log monitoring (HLDS console output)
+- 📅 Map management: list, delete, add
+- 📡 Webhook support for events like:
+  - `server_started`
+  - `server_stopped`
+  - `map_added`
+  - `map_deleted`
+  - `error_occurred`
+- 🔧 Responsive interface with **React**, **TailwindCSS**, and **Tauri**
+- 🌍 Native build for **Windows**, **Linux**, and (soon) macOS
+
+---
+
+### 🚀 Installation (Developers)
+
+> Requirements: [Rust](https://www.rust-lang.org/), [Node.js](https://nodejs.org/), [Tauri CLI](https://tauri.app/)
+
+```bash
+git clone https://github.com/seu-usuario/canalhas-manager.git
+cd canalhas-manager
+pnpm install  # or npm / yarn
+tauri dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+To generate the build:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+```bash
+tauri build
 ```
+
+---
+
+### 🌐 Webhooks
+
+Configure webhooks to be notified in real-time via Discord, Slack, etc.
+
+**Example Discord payload:**
+
+```json
+{
+  "username": "Canalhas Manager",
+  "embeds": [
+    {
+      "title": "Servidor Iniciado!",
+      "description": "Servidor iniciado com sucesso\n🕒 31/03/2025 02:22:04",
+      "color": 16426444
+    }
+  ]
+}
+```
+
+---
+
+### 🎓 Community and Contribution
+
+This project was created to help the HLDS server community.
+
+Contributions are very welcome! Feel free to open an **issue**, send a **pull request**, or suggest ideas.
+
+---
+
+### 🔒 License
+
+[MIT](./LICENSE)
+
+---
+
+**Made with ❤️ by Canalhas.**
