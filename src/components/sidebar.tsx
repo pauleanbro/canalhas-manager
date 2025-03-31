@@ -2,10 +2,12 @@
 "use client";
 
 import {
+  FileCog,
   LayoutDashboard,
   Map as MapIcon,
   Power,
   ServerCog,
+  Users,
   Webhook,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -79,6 +81,23 @@ export function Sidebar() {
             <TooltipTrigger asChild>
               <Button
                 variant={
+                  location.pathname === "/settings" ? "default" : "ghost"
+                }
+                size="icon"
+                onClick={() => navigate("/settings")}
+              >
+                <FileCog className="w-5 h-5" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right">
+              Configurações de Inicialização
+            </TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant={
                   location.pathname === "/webhooks" ? "default" : "ghost"
                 }
                 size="icon"
@@ -88,6 +107,21 @@ export function Sidebar() {
               </Button>
             </TooltipTrigger>
             <TooltipContent side="right">Webhooks</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant={
+                  location.pathname === "/administradores" ? "default" : "ghost"
+                }
+                size="icon"
+                onClick={() => navigate("/administradores")}
+              >
+                <Users className="w-5 h-5" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right">Administradores</TooltipContent>
           </Tooltip>
         </div>
 
@@ -108,21 +142,6 @@ export function Sidebar() {
             <TooltipContent side="right">
               {serverRunning ? "Desligar Servidor" : "Ligar Servidor"}
             </TooltipContent>
-          </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant={
-                  location.pathname === "/settings" ? "default" : "ghost"
-                }
-                size="icon"
-                onClick={() => navigate("/settings")}
-              >
-                <ServerCog className="w-5 h-5" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="right">Configurações</TooltipContent>
           </Tooltip>
         </div>
       </div>
