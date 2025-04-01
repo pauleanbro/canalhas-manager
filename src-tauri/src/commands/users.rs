@@ -68,38 +68,37 @@ pub fn list_admins(state: State<HldsPaths>) -> Result<Vec<AdminEntry>, String> {
 }
 
 #[tauri::command]
-pub async fn remove_admin(state: State<'_, HldsPaths>, auth: String) -> Result<(), String> {
+pub async fn add_admin(state: State<'_, HldsPaths>, entry: AdminEntry) -> Result<(), String> {
     let path = state
         .hlds_path
         .join("cstrike/addons/amxmodx/configs/users.ini");
-    let content = fs::read_to_string(&path).map_err(|e| e.to_string())?;
+    let mut file = File::options()
+        .append(true)
+        .open(&path)
+        .map_err(|e| e.to_string())?;
 
-    let mut lines: Vec<&str> = vec![];
-    let mut skip_next = false;
-
-    for line in content.lines() {
-        if skip_next {
-            skip_next = false;
-            continue;
-        }
-
-        if line.trim().starts_with('"') && line.contains(&auth) {
-            if let Some(prev) = lines.last() {
-                if prev.trim().starts_with("#[NOME:") {
-                    lines.pop();
-                }
-            }
-            continue;
-        }
-
-        lines.push(line);
+    if let Some(name) = &entry.name {
+        writeln!(file, "#[NOME: {}]", name).map_err(|e| e.to_string())?;
     }
 
-    fs::write(&path, lines.join("\n") + "\n").map_err(|e| e.to_string())?;
+    writeln!(
+        file,
+        "\"{}\" \"{}\" \"{}\" \"{}\"",
+        entry.auth, entry.password, entry.access, entry.flags
+    )
+    .map_err(|e| e.to_string())?;
+
+    let label = match &entry.name {
+        Some(name) => format!("{name} ({})", entry.auth),
+        None => entry.auth.clone(),
+    };
 
     emit_event(WebhookEvent::Custom {
-        title: "Administrador Removido".into(),
-        message: format!("ID `{}` foi removido da lista de admins", auth),
+        title: "Novo Administrador Adicionado".into(),
+        message: format!(
+            "📥 O **\"{}\"** foi adicionado à lista de administradores.",
+            label
+        ),
     })
     .await;
 
@@ -149,9 +148,14 @@ pub async fn update_admin(state: State<'_, HldsPaths>, updated: AdminEntry) -> R
 
     fs::write(&path, lines.join("\n") + "\n").map_err(|e| e.to_string())?;
 
+    let label = match &updated.name {
+        Some(name) => format!("{name} ({})", updated.auth),
+        None => updated.auth.clone(),
+    };
+
     emit_event(WebhookEvent::Custom {
         title: "Administrador Atualizado".into(),
-        message: format!("ID `{}` teve seus dados atualizados", updated.auth),
+        message: format!("🛠️ O **\"{}\"** teve seus dados atualizados.", label),
     })
     .await;
 
@@ -159,29 +163,52 @@ pub async fn update_admin(state: State<'_, HldsPaths>, updated: AdminEntry) -> R
 }
 
 #[tauri::command]
-pub async fn add_admin(state: State<'_, HldsPaths>, entry: AdminEntry) -> Result<(), String> {
+pub async fn remove_admin(state: State<'_, HldsPaths>, auth: String) -> Result<(), String> {
     let path = state
         .hlds_path
         .join("cstrike/addons/amxmodx/configs/users.ini");
-    let mut file = File::options()
-        .append(true)
-        .open(&path)
-        .map_err(|e| e.to_string())?;
+    let content = fs::read_to_string(&path).map_err(|e| e.to_string())?;
 
-    if let Some(name) = &entry.name {
-        writeln!(file, "#[NOME: {}]", name).map_err(|e| e.to_string())?;
+    let mut lines: Vec<&str> = vec![];
+    let mut skip_next = false;
+    let mut name = None;
+
+    for line in content.lines() {
+        if skip_next {
+            skip_next = false;
+            continue;
+        }
+
+        if line.trim().starts_with('"') && line.contains(&auth) {
+            if let Some(prev) = lines.last() {
+                if prev.trim().starts_with("#[NOME:") {
+                    name = prev
+                        .trim()
+                        .strip_prefix("#[NOME:")
+                        .and_then(|s| s.strip_suffix("]"))
+                        .map(str::to_string);
+                    lines.pop();
+                }
+            }
+            continue;
+        }
+
+        lines.push(line);
     }
 
-    writeln!(
-        file,
-        "\"{}\" \"{}\" \"{}\" \"{}\"",
-        entry.auth, entry.password, entry.access, entry.flags
-    )
-    .map_err(|e| e.to_string())?;
+    fs::write(&path, lines.join("\n") + "\n").map_err(|e| e.to_string())?;
+
+    let label = match name {
+        Some(n) => format!("{n} ({})", auth),
+        None => auth.clone(),
+    };
 
     emit_event(WebhookEvent::Custom {
-        title: "Novo Administrador Adicionado".into(),
-        message: format!("ID `{}` foi adicionado como admin", entry.auth),
+        title: "Administrador Removido".into(),
+        message: format!(
+            "❌ O **\"{}\"** foi removido da lista de administradores.",
+            label
+        ),
     })
     .await;
 

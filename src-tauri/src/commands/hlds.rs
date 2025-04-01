@@ -109,6 +109,12 @@ pub fn start_hlds_server(app: AppHandle, state: State<HldsState>) -> Result<(), 
                 });
             }
 
+            if line.to_lowercase().contains("couldn't open") {
+                tauri::async_runtime::spawn(async {
+                    emit_event(WebhookEvent::ErrorOccurred).await;
+                });
+            }
+
             let timestamp = Local::now().format("%H:%M:%S");
             let formatted = format!("[{}] {}", timestamp, line);
             let _ = app_clone.emit("hlds-log", &formatted);

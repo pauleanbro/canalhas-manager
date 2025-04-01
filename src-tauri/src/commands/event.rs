@@ -37,14 +37,14 @@ impl WebhookEvent {
     }
 
     pub fn description(&self) -> String {
-        let timestamp = Local::now().format("%d/%m/%Y %H:%M:%S");
         match self {
-            Self::ServerStarted => format!("Servidor iniciado com sucesso\n🕒 {}", timestamp),
-            Self::ServerStopped => format!("Servidor desligado com sucesso\n🕒 {}", timestamp),
-            Self::ErrorOccurred => format!("Um erro crítico ocorreu no servidor\n🕒 {}", timestamp),
-            Self::MapAdded(_) | Self::MapDeleted(_) | Self::MapChanged(_) | Self::Custom { .. } => {
-                format!("🕒 {}", timestamp)
-            }
+            Self::ServerStarted => "Servidor iniciado com sucesso.".into(),
+            Self::ServerStopped => "Servidor desligado com sucesso.".into(),
+            Self::ErrorOccurred => "Um erro crítico ocorreu no servidor.".into(),
+            Self::MapAdded(name) => format!("O mapa `{}` foi adicionado com sucesso.", name),
+            Self::MapDeleted(name) => format!("O mapa `{}` foi removido do servidor.", name),
+            Self::MapChanged(name) => format!("O mapa atual foi alterado para `{}`.", name),
+            Self::Custom { message, .. } => message.clone(),
         }
     }
 }
