@@ -32,6 +32,7 @@ export default function WebhookManager() {
     "map_deleted",
     "map_changed",
     "custom_event",
+    "knife_kill",
   ];
 
   const loadWebhooks = async () => {

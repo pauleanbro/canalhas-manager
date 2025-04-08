@@ -8,6 +8,7 @@ use commands::{
         get_hlds_path, get_server_config, is_hlds_running, save_hlds_path, save_server_config,
         send_command_to_hlds, start_hlds_server, stop_hlds_server, HldsState,
     },
+    knife_scheduler::start_knife_scheduler,
     maps::{delete_map_files, list_maps},
     system::get_system_stats,
     users::{add_admin, list_admins, remove_admin, update_admin, HldsPaths},
@@ -16,6 +17,8 @@ use commands::{
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    start_knife_scheduler();
+
     tauri::Builder::default()
         .manage(HldsState {
             process: std::sync::Arc::new(std::sync::Mutex::new(None)),

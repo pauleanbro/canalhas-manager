@@ -1,4 +1,4 @@
-use chrono::Local;
+use chrono::Utc;
 use once_cell::sync::Lazy;
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
@@ -64,14 +64,39 @@ pub async fn emit_event(event: WebhookEvent) {
         matching_hooks.len()
     );
 
+    let color = match &event {
+        WebhookEvent::ServerStarted => 0x57F287,
+        WebhookEvent::ServerStopped => 0xED4245,
+        WebhookEvent::ErrorOccurred => 0xFF0000,
+        WebhookEvent::MapAdded(_) => 0x00B0F4,
+        WebhookEvent::MapDeleted(_) => 0xFAA61A,
+        WebhookEvent::MapChanged(_) => 0x5865F2,
+        WebhookEvent::KnifeKill { .. } => 0x9b59b6,
+        WebhookEvent::Custom { .. } => 0xfb7f0c,
+    };
+
+    let mut embed = serde_json::json!({
+        "title": event.title(),
+        "description": event.description(),
+        "color": color,
+        "author": {
+            "name": "Canalhas Manager",
+            "icon_url": "https://i.imgur.com/fKL31aD.jpg"
+        },
+        "footer": {
+            "text": "Canalhas Manager",
+            "icon_url": "https://i.imgur.com/fKL31aD.jpg"
+        },
+        "timestamp": Utc::now().to_rfc3339()
+    });
+
+    if let Some(fields) = event.fields() {
+        embed["fields"] = serde_json::Value::Array(fields);
+    }
+
     let payload = serde_json::json!({
         "username": "Canalhas Manager",
-        "content": format!("📣 Alerta: {}", event.title()),
-        "embeds": [{
-            "title": event.title(),
-            "description": event.description(),
-            "color": 0xfb7f0c
-        }]
+        "embeds": [embed]
     });
 
     for webhook in matching_hooks {
