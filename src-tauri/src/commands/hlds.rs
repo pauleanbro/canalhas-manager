@@ -17,6 +17,7 @@ use tauri::Emitter;
 use tauri::{AppHandle, Manager, State};
 
 use crate::commands::event::WebhookEvent;
+use crate::commands::knife_score::register_knife_kill;
 use crate::commands::webhook::emit_event;
 
 pub struct HldsState {
@@ -103,10 +104,45 @@ pub fn start_hlds_server(app: AppHandle, state: State<HldsState>) -> Result<(), 
                 break;
             }
 
-            if line.to_lowercase().contains("segmentation fault") {
+            let line_lower = line.to_lowercase();
+
+            if line_lower.contains("segmentation fault") || line_lower.contains("couldn't open") {
                 tauri::async_runtime::spawn(async {
                     emit_event(WebhookEvent::ErrorOccurred).await;
                 });
+            }
+
+            if line.starts_with("[CANALHAS-EVENT] knife_kill |") {
+                let data = line
+                    .trim_start_matches("[CANALHAS-EVENT] knife_kill |")
+                    .trim();
+                let parts: Vec<&str> = data.split('|').map(str::trim).collect();
+
+                if parts.len() == 4 {
+                    let killer_id = parts[0].to_string();
+                    let killer_name = parts[1].to_string();
+                    let victim_id = parts[2].to_string();
+                    let victim_name = parts[3].to_string();
+
+                    tauri::async_runtime::spawn(async move {
+                        let (killer_score, victim_score) = register_knife_kill(
+                            killer_id.clone(),
+                            killer_name.clone(),
+                            victim_id.clone(),
+                            victim_name.clone(),
+                        );
+
+                        emit_event(WebhookEvent::KnifeKill {
+                            killer_id,
+                            killer_name,
+                            victim_id,
+                            victim_name,
+                            killer_score,
+                            victim_score,
+                        })
+                        .await;
+                    });
+                }
             }
 
             let timestamp = Local::now().format("%H:%M:%S");
