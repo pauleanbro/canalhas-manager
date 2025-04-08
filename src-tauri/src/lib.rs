@@ -1,5 +1,7 @@
 mod commands;
 
+use std::path::PathBuf;
+
 use commands::{
     greet::greet,
     hlds::{
@@ -9,6 +11,7 @@ use commands::{
     knife_scheduler::start_knife_scheduler,
     maps::{delete_map_files, list_maps},
     system::get_system_stats,
+    users::{add_admin, list_admins, remove_admin, update_admin, HldsPaths},
     webhook::{add_webhook, list_webhooks, remove_webhook},
 };
 
@@ -19,6 +22,12 @@ pub fn run() {
     tauri::Builder::default()
         .manage(HldsState {
             process: std::sync::Arc::new(std::sync::Mutex::new(None)),
+        })
+        .manage(HldsPaths {
+            hlds_path: get_hlds_path()
+                .unwrap_or(None)
+                .map(PathBuf::from)
+                .unwrap_or_else(|| PathBuf::from(".")),
         })
         .invoke_handler(tauri::generate_handler![
             greet,
@@ -36,6 +45,10 @@ pub fn run() {
             add_webhook,
             remove_webhook,
             list_webhooks,
+            list_admins,
+            add_admin,
+            update_admin,
+            remove_admin,
         ])
         .plugin(tauri_plugin_app::init())
         .plugin(tauri_plugin_dialog::init())
